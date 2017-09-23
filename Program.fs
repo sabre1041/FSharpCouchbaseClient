@@ -18,7 +18,12 @@ let fetch (cluster: Cluster) bucketName (query: string) =
 
 [<EntryPoint>]
 let main argv =
-    let uris = [Uri("http://localhost:8091")]
+    let couchUrl = 
+        if Array.length argv > 0 
+        then argv.[0] 
+        else "http://localhost:8091"
+    
+    let uris = [Uri(couchUrl)]
     let cluster = new Cluster(ClientConfiguration(Servers = toGenericList uris, UseSsl = false))
 
     ("travel-sample", "SELECT * FROM `travel-sample` LIMIT 10")
