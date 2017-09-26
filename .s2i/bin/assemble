@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+
+APP_DLL_NAME="${APP_DLL_NAME:-Main.dll}"
+
+echo "---> Copying application source ..."
+cp -Rf /tmp/src/. ./
+
+# Create run script in publish folder
+cat << EOF >"$DOTNET_APP_PATH/$DOTNET_DEFAULT_CMD"
+#!/bin/bash
+
+exec dotnet ${APP_DLL_NAME} \$@
+EOF
+chmod +x "$DOTNET_APP_PATH/$DOTNET_DEFAULT_CMD"
+
+# Fix source directory permissions
+fix-permissions ./
+# set permissions for any installed artifacts
+fix-permissions /opt/app-root
+
+echo "---> Packing application..."
+tar -czf /opt/app-root/app.tar.gz -C $DOTNET_APP_PATH .
+fix-permissions /opt/app-root/app.tar.gz
